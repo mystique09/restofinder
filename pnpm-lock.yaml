@@ -11,6 +11,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.16.0
         version: 1.16.0(hono@4.8.5)
+      dotenv:
+        specifier: ^17.2.0
+        version: 17.2.0
       hono:
         specifier: ^4.8.5
         version: 4.8.5
@@ -18,9 +21,6 @@ importers:
       '@types/node':
         specifier: ^20.11.17
         version: 20.19.8
-      dotenv:
-        specifier: ^17.2.0
-        version: 17.2.0
       tsx:
         specifier: ^4.7.1
         version: 4.20.3
