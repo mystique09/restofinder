@@ -53,7 +53,10 @@ interface IndexResponse {
 }
 
 async function index(c: HonoContext): Promise<ApiResponse<IndexResponse>> {
-  return c.json({ message: "Hello, world" });
+  return c.json({
+    message: "Welcome to RestoFinder API server.",
+    github: "https://github.com/mystique09/restofinder",
+  });
 }
 
 async function healthz(c: HonoContext): Promise<ApiResponse<{ API: string }>> {
