@@ -20,6 +20,11 @@ Go to the restofinder directory
 cd restofinder
 ```
 
+Create a ".env" file and add your environment variables, you can view the .sample.env file for the required environment variables.
+```
+cp .sample.env .env
+```
+
 Run these commands to run the API server
 ```nushell
 npm install
