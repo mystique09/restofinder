@@ -7,6 +7,8 @@ import type { LLMProvider } from "../domain/models/gemini.js";
 import type { FourSquarePlaceSearchResponse } from "../domain/models/restaurant.js";
 import type { FourSquarePlaceSearchService } from "../infrastucture/place-search/four-square-place-search.js";
 import type { ApiConfig } from "../infrastucture/config/api-config.js";
+import { logger } from "hono/logger";
+import { compress } from "hono/compress";
 
 export type Result<T, E> = {
   ok?: T;
@@ -36,6 +38,8 @@ export function buildRouter(
     c.set("secretKey", config.secret_key);
     await next();
   });
+  app.use(logger());
+  app.use(compress());
 
   app.get("/", index);
   app.get("/healthz", healthz);
