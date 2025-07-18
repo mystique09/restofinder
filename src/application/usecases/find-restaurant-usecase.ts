@@ -40,6 +40,10 @@ export class FourSquarePlaceSearcUsecase {
 
       return { ok: response };
     } catch (e) {
+      const error = e as { message: string };
+      const message = error.message;
+
+      console.error(message);
       return { error: "Invalid response from LLM provider" };
     }
   }
