@@ -6,6 +6,7 @@ import { FourSquarePlaceSearcUsecase } from "../application/usecases/find-restau
 import type { LLMProvider } from "../domain/models/gemini.js";
 import type { FourSquarePlaceSearchResponse } from "../domain/models/restaurant.js";
 import type { FourSquarePlaceSearchService } from "../infrastucture/place-search/four-square-place-search.js";
+import type { ApiConfig } from "../infrastucture/config/api-config.js";
 
 export type Result<T, E> = {
   ok?: T;
@@ -21,15 +22,18 @@ type ApiResponse<T extends Object> = Response &
 type State = {
   llmProvider: LLMProvider;
   fourPlaceSearchService: FourSquarePlaceSearchService;
+  secretKey: string;
 };
 
 export function buildRouter(
-  llm_provider: LLMProvider
+  llm_provider: LLMProvider,
+  config: ApiConfig
 ): HonoApp<{ Variables: State }, BlankSchema> {
   const app = new Hono<{ Variables: State }>();
 
   app.use(async (c, next) => {
     c.set("llmProvider", llm_provider);
+    c.set("secretKey", config.secret_key);
     await next();
   });
 
@@ -63,7 +67,8 @@ async function execute(
     return c.json({ error: "Forbidden" });
   }
 
-  if (code !== "pioneerdevai") {
+  const secretKey = c.get("secretKey");
+  if (code !== secretKey) {
     c.status(401);
     return c.json({ error: "Forbidden" });
   }

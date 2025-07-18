@@ -19,7 +19,7 @@ const placeSearchTool = new PlaceSearchTool(
 const gemini = new GeminiProvider(config.gemini_key, new Map());
 gemini.addTool(placeSearchTool);
 
-const app = buildRouter(gemini);
+const app = buildRouter(gemini, config);
 
 serve(
   {

@@ -1,10 +1,11 @@
 import dotenv from "dotenv";
 
-interface ApiConfig {
+export interface ApiConfig {
   host: string;
   port: number;
   four_square_api_key: string;
   gemini_key: string;
+  secret_key: string;
 }
 
 export function buildAPIConfig(): ApiConfig {
@@ -14,6 +15,7 @@ export function buildAPIConfig(): ApiConfig {
   const port = parseInt(process.env.PORT ?? "3000");
   const four_square_api_key = process.env.FOUR_SQUARE_API_KEY ?? "";
   const gemini_key = process.env.GEMINI_KEY ?? "";
+  const secret_key = process.env.SECRET_KEY ?? "";
 
   if (!four_square_api_key) {
     console.error("Missing FOUR SQUARE API KEY");
@@ -23,5 +25,5 @@ export function buildAPIConfig(): ApiConfig {
     console.error("Missing GEMINI API KEY");
   }
 
-  return { host, port, four_square_api_key, gemini_key };
+  return { host, port, four_square_api_key, gemini_key, secret_key };
 }
