@@ -35,3 +35,6 @@ You can access the API via this URL
 ```nushell
 open http://localhost:3000
 ```
+
+### Limitations
+The LLM is not fine-tuned, expect whack results. Sometimes the Gemini model won't follow the Function call format so it returns an invalid data to the FourSqaure place search service.
