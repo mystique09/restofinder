@@ -1,29 +1,26 @@
-FROM node:18-alpine AS builder
 
-WORKDIR /usr/src/app
+FROM node:22-alpine AS base
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+FROM base AS builder
 
-RUN npm install -g pnpm
-RUN pnpm install
+RUN apk add --no-cache gcompat
+WORKDIR /app
 
-COPY . .
+COPY package*json tsconfig.json src ./
 
-EXPOSE ${PORT}
+RUN npm install && \
+    npm run build && \
+    npm prune --production
 
-RUN pnpm run build
+FROM base AS runner
+WORKDIR /app
 
-FROM node:18-alpine AS production
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 hono
 
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-
-COPY --from=builder /usr/src/app/package.json ./
-COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
-
-RUN npm install -g pnpm && pnpm install --prod
+COPY --from=builder --chown=hono:nodejs /app/node_modules /app/node_modules
+COPY --from=builder --chown=hono:nodejs /app/dist /app/dist
+COPY --from=builder --chown=hono:nodejs /app/package.json /app/package.json
 
 ARG HOST
 ARG PORT
@@ -35,4 +32,7 @@ ENV HOST=${HOST} \
     FOUR_SQUARE_API_KEY=${FOUR_SQUARE_API_KEY}\
     GEMINI_KEY=${GEMINI_KEY}
 
-CMD ["node", "./dist/index.js"]
+USER hono
+EXPOSE ${PORT}
+
+CMD ["node", "/app/dist/index.js"]
