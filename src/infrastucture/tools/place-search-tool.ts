@@ -99,11 +99,7 @@ export class PlaceSearchTool implements Tool<SearchPlace> {
           },
           sort: {
             type: "string",
-            description: `Specifies the order in which results are listed. Possible values are:
-              relevance (default)
-              rating
-              distance
-            `,
+            description: `Specifies the order in which results are listed. Possible values are: relevance (default), rating, distance.`,
           },
           limit: {
             type: "number",

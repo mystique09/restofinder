@@ -14,9 +14,24 @@ const INITIAL_PROMP: GeminiContent = {
   parts: [
     {
       text: `
-      You are an AI that has an access to a tool called "Place Search".
-      You have access to a tool "placeSearch" that fetches data to an external source, you must use this tool in every request from the user.
-      Your response must be in JSON format only, follow the tool parameters.
+      <AI>
+        <description>
+          You are an AI that has access to a tool called "Place Search".
+          You have access to a tool "placeSearch" that fetches data from an external source,
+          you must use this tool in every request from the user.
+        </description>
+      </AI>
+      <response_requirements>
+        <format>JSON only</format>
+        <reply_type>function call only</reply_type>
+        <instructions>
+          <instruction>Follow all the tool parameters</instruction>
+          <instruction>Do not reply with text</instruction>
+          <instruction>Always reply with a function call</instruction>
+          <instruction>Always follow the function call format</instruction>
+        </instructions>
+      </response_requirements>
+      </AI>
       `,
     },
   ],
@@ -41,6 +56,7 @@ export class GeminiProvider implements LLMProvider {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(10000),
     });
 
     const response = (await request.json()) as GeminiResponse;

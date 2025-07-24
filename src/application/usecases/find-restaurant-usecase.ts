@@ -7,11 +7,20 @@ import type {
 import type { FourSquarePlaceSearchResponse } from "../../domain/models/restaurant.js";
 
 export class FourSquarePlaceSearcUsecase {
-  constructor(private llmProvider: LLMProvider) { }
+  maxRetries = 3;
+  retryCount = 0;
+
+  constructor(private llmProvider: LLMProvider) {}
 
   async execute(
     search: string
   ): Promise<Result<FourSquarePlaceSearchResponse, ApiError>> {
+    if (this.retryCount >= this.maxRetries) {
+      return {
+        error: "Sorry, I'm having trouble finding that. Please try again.",
+      };
+    }
+
     if (!search) {
       return { error: "Query must not be empty" };
     }
@@ -21,15 +30,23 @@ export class FourSquarePlaceSearcUsecase {
         search
       )) as GeminiResponse;
       const { candidates } = geminiResponse;
+
       const parts =
         candidates.map((c) => c.content.parts).find((c) => c.length > 0) ?? [];
+
+      console.log(parts);
 
       const functionCall = parts
         .map((p) => p.functionCall)
         .find((p) => p.name === "placeSearch");
 
       if (!functionCall) {
-        return { error: "Invalid response from LLM provider" };
+        this.retryCount++;
+
+        setTimeout(() => Promise.resolve(), 2000);
+        return await this.execute(
+          `Invalid response: ${JSON.stringify(parts)}, ${search}`
+        );
       }
 
       const toolName = functionCall.name;
@@ -40,11 +57,15 @@ export class FourSquarePlaceSearcUsecase {
 
       return { ok: response };
     } catch (e) {
+      this.retryCount++;
+
       const error = e as { message: string };
       const message = error.message;
 
       console.error(message);
-      return { error: "Invalid response from LLM provider" };
+
+      setTimeout(() => Promise.resolve(), 2000);
+      return await this.execute(`Invalid response: ${message}, ${search}`);
     }
   }
 }
